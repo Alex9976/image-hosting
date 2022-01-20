@@ -3,15 +3,16 @@ const { Schema, model, Types } = require('mongoose')
 const schema = new Schema({
     title: {
         type: String,
-        required: true
+        default: ''
     },
-    fileName: {
+    imagePath: {
         type: String,
         required: true
     },
     uploadDate: {
-        type: String,
-        required: true
+        type: Date,
+        required: true,
+        default: new Date().toISOString()
     },
     authorId: {
         type: Types.ObjectId,

@@ -129,8 +129,8 @@ function main() {
     }
   })
 
-  ipcMain.on('upload-image', (event, title, bytes) => {
-    socket.send('upload_image', { jwt: socket.jwt, title, bytes })
+  ipcMain.on('upload-image', (event, title, fileName, bytes) => {
+    socket.send('upload_image', { jwt: socket.jwt, fileName, title, bytes })
     if (!uploadWindow) {
       uploadWindow.close()
     }

@@ -103,10 +103,25 @@ async function start() {
             })
 
             socket.on('upload_image', async (data) => {
-                let { jwt, title, bytes } = data
+                let { jwt, title, fileName, bytes } = data
                 const buffer = Buffer.from(bytes);
-                await fs.writeFile('./images/img.jpg', buffer)
-                console.log(bytes)
+                const date = new Date().toLocaleString().replaceAll(':', '.')
+                const uploadDate = new Date().toISOString()
+                const imagePath = path.join(__dirname, './images/', date + fileName)
+
+                await fs.writeFile(`./images/${date}${fileName}`, buffer, function (err) {
+                    if (err) {
+                        return console.log(err);
+                    }
+                })
+
+                const image = new Image({
+                    title,
+                    imagePath,
+                    uploadDate
+                })
+
+                await image.save()
             })
         })
 
