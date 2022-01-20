@@ -29,3 +29,12 @@ ipcRenderer.on('authentication', (evt, message) => {
         items.innerHTML = '<div class="item" onclick="openSignIn()">Sign In</div><div class="item" onclick="openSignUp()">Sign Up</div>'
     }
 })
+
+ipcRenderer.on('update-images', (evt, data) => {
+    const items = document.getElementById('main')
+    let content = ''
+    for (const image of data.images) {
+        content += `<img src="${image.imagePath}" class="image" />`
+    }
+    items.innerHTML = content
+})

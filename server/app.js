@@ -104,24 +104,30 @@ async function start() {
 
             socket.on('upload_image', async (data) => {
                 let { jwt, title, fileName, bytes } = data
-                const buffer = Buffer.from(bytes);
-                const date = new Date().toLocaleString().replaceAll(':', '.')
-                const uploadDate = new Date().toISOString()
-                const imagePath = path.join(__dirname, './images/', date + fileName)
+                let decoded = verifyJwt(jwt)
 
-                await fs.writeFile(`./images/${date}${fileName}`, buffer, function (err) {
-                    if (err) {
-                        return console.log(err);
-                    }
-                })
+                if (decoded) {
+                    const user = await User.findById(decoded.userId)
+                    const buffer = Buffer.from(bytes);
+                    const date = new Date().toLocaleString().replaceAll(':', '.')
+                    const uploadDate = new Date().toISOString()
+                    const imagePath = path.join(__dirname, './images/', date + fileName)
 
-                const image = new Image({
-                    title,
-                    imagePath,
-                    uploadDate
-                })
+                    await fs.writeFile(`./images/${date}${fileName}`, buffer, function (err) {
+                        if (err) {
+                            return console.log(err);
+                        }
+                    })
 
-                await image.save()
+                    const image = new Image({
+                        title,
+                        imagePath,
+                        uploadDate,
+                        authorId: user.id
+                    })
+
+                    await image.save()
+                }
             })
         })
 

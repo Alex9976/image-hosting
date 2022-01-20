@@ -26,6 +26,7 @@ function main() {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('authentication', false)
+    socket.send('get_images', '')
   })
 
   let socket = new Connection('http://localhost:5000')
@@ -59,6 +60,19 @@ function main() {
       }
     } else {
       mainWindow.webContents.send('authentication', false)
+      message('Invalid auth_result data')
+    }
+  })
+
+  socket.socket.on('get_images_result', (data) => {
+    if (JSON.stringify(data)) {
+      let error = data.error
+      if (error) {
+        console.log(error)
+      } else {
+        mainWindow.webContents.send('update-images', data)
+      }
+    } else {
       message('Invalid auth_result data')
     }
   })
