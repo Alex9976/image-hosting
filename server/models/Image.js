@@ -5,7 +5,7 @@ const schema = new Schema({
         type: String,
         default: ''
     },
-    imagePath: {
+    imageName: {
         type: String,
         required: true
     },
@@ -23,10 +23,6 @@ const schema = new Schema({
         type: Number,
         default: 0
     },
-    comments: [{
-        type: Types.ObjectId,
-        ref: 'Comment'
-    }]
 })
 
 module.exports = model('Image', schema)

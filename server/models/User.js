@@ -19,10 +19,6 @@ const schema = new Schema({
         type: Types.ObjectId,
         ref: 'Image'
     }],
-    comments: [{
-        type: Types.ObjectId,
-        ref: 'Comment'
-    }]
 })
 
 module.exports = model('User', schema)

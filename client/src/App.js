@@ -10,6 +10,8 @@ import { ImagesPage } from "./pages/ImagesPage";
 import { NavBar } from "./components/NavBar";
 import { UploadPage } from "./pages/UploadPage";
 import { SigninPage } from './pages/SigninPage';
+import { SignupPage } from './pages/SignupPage';
+import { ImagePage } from './pages/ImagePage';
 
 const socket_p = 'socket';
 
@@ -100,19 +102,12 @@ function App() {
                             <Route exact path='/' element={<ImagesPage />} />
                             <Route exact path='/upload' element={<UploadPage />} />
                             <Route exact path='/signin' element={<SigninPage />} />
+                            <Route exact path='/signup' element={<SignupPage />} />
+                            <Route exact path='/image' element={<ImagePage />} />
                         </Routes>
                         :
                         <LoaderScreenCentered />
                     }
-                    {/* <NavBar />
-                    {isReady
-                        ?
-                        <div className="container">
-                            {routes}
-                        </div>
-                        :
-                        <LoaderScreenCentered />
-                    } */}
                 </Fragment>
             </Router>
         </AppContext.Provider>

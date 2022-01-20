@@ -37,9 +37,9 @@ export const ImagesPage = () => {
                 {
                     images.map(image => {
                         return (
-                            <NavLink key={image._id} className="collection-item" to={`/image?id=${image._id}`} onClick={(event) => event.preventDefault()}>
+                            <NavLink key={image._id} className="collection-item" to={`/image?id=${image._id}`}>
                                 <div className="image-collection-item-bg">
-                                    <div className="image-collection-item" style={{ backgroundImage: `url(http://localhost:3000/${image.imagePath}` }}></div>
+                                    <div className="image-collection-item" style={{ backgroundImage: `url(http://localhost:3000/${image.imageName}` }}></div>
                                 </div>
                             </NavLink>
                         )

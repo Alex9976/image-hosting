@@ -38,10 +38,10 @@ async function start() {
                     if (verifyJwt(jwt)) {
                         socket.emit('auth_result', { jwt })
                     } else {
-                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt', type: 'auth' })
                     }
                 } else {
-                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt', type: 'auth' })
                 }
             })
 
@@ -49,12 +49,12 @@ async function start() {
                 const { email, login, password } = data
 
                 if (await User.findOne({ email })) {
-                    socket.emit('auth_result', { error: 'User with that email already exists' })
+                    socket.emit('auth_result', { error: 'User with that email already exists', type: 'signUp' })
                     return
                 }
 
                 if (await User.findOne({ login })) {
-                    socket.emit('auth_result', { error: 'User with that login already exists' })
+                    socket.emit('auth_result', { error: 'User with that login already exists', type: 'signUp' })
                     return
                 }
 
@@ -72,17 +72,16 @@ async function start() {
 
             socket.on('sign_in', async (data) => {
                 const { login, password } = data
-                console.log(data)
 
                 const user = await User.findOne({ login })
                 if (!user) {
-                    socket.emit('auth_result', { error: "User does not exist" })
+                    socket.emit('auth_result', { error: 'User does not exist', type: 'signIn' })
                     return
                 }
 
                 const isMatch = await bcrypt.compare(password, user.hashedPassword)
                 if (!isMatch) {
-                    socket.emit('auth_result', { error: "Invalid password" })
+                    socket.emit('auth_result', { error: 'Invalid password', type: 'signIn' })
                     return
                 }
 
@@ -97,9 +96,121 @@ async function start() {
 
             socket.on('get_image', async (data) => {
                 if (data) {
-                    let { imageId } = data
-                    let images = await Image.find({ _id: imageId })
-                    socket.emit('get_image_result', { images: images })
+                    let { jwt, imageId } = data
+                    var isLiked = false
+                    var isAuth = false
+                    let image = await Image.findById(imageId)
+                    if (jwt) {
+                        let decoded = verifyJwt(jwt)
+                        if (decoded) {
+                            isAuth = true
+                            const user = await User.findById(decoded.userId)
+                            var likedImages = user.likedImagesId
+                            const index = likedImages.indexOf(imageId)
+                            if (index !== -1) {
+                                isLiked = true
+                            }
+                            socket.emit('get_image_result', { image, isLiked, isAuth })
+                        }
+                    }
+                    else {
+                        socket.emit('get_image_result', { image, isLiked, isAuth })
+                    }
+                }
+            })
+
+            socket.on('image_like', async (data) => {
+                if (data) {
+                    let { id, jwt } = data
+                    let decoded = verifyJwt(jwt)
+                    if (decoded) {
+                        try {
+                            const user = await User.findById(decoded.userId)
+                            const image = await Image.findById(id)
+
+                            var likedImagesByUser = user.likedImagesId
+                            var imageLikesCount = image.likes
+
+                            const index = likedImagesByUser.indexOf(id);
+                            let isLiked = false
+                            if (index !== -1) {
+                                likedImagesByUser.splice(index, 1);
+                                imageLikesCount--
+                            } else {
+                                isLiked = true
+                                likedImagesByUser.push(id)
+                                imageLikesCount++
+                            }
+
+                            await User.findByIdAndUpdate(decoded.userId, {
+                                likedImagesId: likedImagesByUser
+                            }, {
+                                upsert: true,
+                                useFindAndModify: false
+                            })
+
+
+                            await Image.findByIdAndUpdate(id, {
+                                likes: imageLikesCount
+                            }, {
+                                upsert: true,
+                                useFindAndModify: false
+                            })
+
+                            socket.emit('image_like_result', { likes: imageLikesCount, isLiked })
+                        } catch (e) {
+                            socket.emit('image_like_result', { likes: -1 })
+                        }
+                    } else {
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    }
+                } else {
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                }
+            })
+
+            socket.on('delete_image', async (data) => {
+                if (data) {
+                    let { id, jwt } = data
+                    let decoded = verifyJwt(jwt)
+                    if (decoded) {
+                        const image = await Image.findById(id)
+                        if (image.authorId.toString() === decoded.userId) {
+                            const imageFilePath = path.join('./images', image.imageName)
+
+                            const users = await User.find({ likedImagesId: id })
+
+                            for (var i = 0; i < users.length; i++) {
+                                const user = users[0]
+
+                                var likedImagesByUser = user.likedImagesId
+                                likedImagesByUser.splice(likedImagesByUser.indexOf(id), 1)
+
+                                await User.findByIdAndUpdate(user._id, {
+                                    likedImagesId: likedImagesByUser
+                                }, {
+                                    upsert: true,
+                                    useFindAndModify: false
+                                })
+                            }
+
+                            await Image.findOneAndDelete({ _id: id })
+
+                            fs.unlink(imageFilePath, function (err) {
+                                if (err) return console.log(err);
+                                console.log(imageFilePath + ' deleted successfully');
+                            });
+
+                            socket.emit('delete_inage_result', {})
+                        }
+                        else {
+                            socket.emit('auth_result', { error: 'Forbidden' })
+                        }
+                    } else {
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    }
+                } else {
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
                 }
             })
 
@@ -123,12 +234,15 @@ async function start() {
 
                     const image = new Image({
                         title,
-                        imagePath: imageName,
+                        imageName,
                         uploadDate,
                         authorId: user.id
                     })
 
                     await image.save()
+
+                    let images = await Image.find({})
+                    socket.broadcast.emit('get_images_result', { images: images })
                 }
             })
         })

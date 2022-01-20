@@ -25,6 +25,39 @@
     transition: all 0.3s ease;
 }
 
+.image-file {
+    width: 80vw;
+    height: 40vw;
+    background-position:center;
+    background-size: cover;
+    transition: all 0.3s ease;
+}
+
+.left-bar {
+    width: 20vw;
+}
+
+.image-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+.image-utils {
+    display: flex;
+}
+
+.img-title {
+    font-size: 1.5em;
+    margin-top: -5px;
+}
+
+.img-window {
+    padding-top: 64px;
+    display: flex;
+}
+
 .image-collection-item:hover {
     transition: all 0.3s ease;
     opacity: 0.5;
