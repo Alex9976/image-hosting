@@ -72,6 +72,7 @@ async function start() {
 
             socket.on('sign_in', async (data) => {
                 const { login, password } = data
+                console.log(data)
 
                 const user = await User.findOne({ login })
                 if (!user) {
@@ -103,17 +104,18 @@ async function start() {
             })
 
             socket.on('upload_image', async (data) => {
-                let { jwt, title, fileName, bytes } = data
+                let { jwt, fileName, title, file } = data
                 let decoded = verifyJwt(jwt)
-
+                const fName = fileName
                 if (decoded) {
                     const user = await User.findById(decoded.userId)
-                    const buffer = Buffer.from(bytes);
-                    const date = new Date().toLocaleString().replaceAll(':', '.')
+                    const buffer = Buffer.from(file);
+                    const date = new Date().toLocaleString().replaceAll(':', '.').replaceAll(' ', '')
                     const uploadDate = new Date().toISOString()
-                    const imagePath = path.join(__dirname, './images/', date + fileName)
+                    const extention = fName.substring(fName.lastIndexOf('.'))
+                    const imageName = date + getRandomString(20) + extention
 
-                    await fs.writeFile(`./images/${date}${fileName}`, buffer, function (err) {
+                    await fs.writeFile(path.join('./images/', imageName), buffer, function (err) {
                         if (err) {
                             return console.log(err);
                         }
@@ -121,7 +123,7 @@ async function start() {
 
                     const image = new Image({
                         title,
-                        imagePath,
+                        imagePath: imageName,
                         uploadDate,
                         authorId: user.id
                     })
@@ -161,3 +163,17 @@ function verifyJwt(token) {
 }
 
 start()
+
+app.get('*', (req, res) => {
+    res.sendFile(__dirname + '/images/' + req.originalUrl)
+})
+
+function getRandomString(length) {
+    const chars = 'abcdefghijklmnopqrstuvwxzABCDEFGHIJKLMNOPQRSTUVWXZ0123456789'
+    let str = ''
+    for (let i = 0; i < length; i++) {
+        const pos = Math.floor(Math.random() * chars.length)
+        str += chars.substring(pos, pos + 1)
+    }
+    return str
+}
