@@ -1,0 +1,19 @@
+{
+  "name": "image-hosting-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "16.0.7",
+    "socket.io-client": "4.4.1",
+    "electron-reload": "2.0.0-alpha.1",
+    "electron-store": "8.0.1",
+    "spectre.css": " 0.5.9"
+  }
+}
