@@ -132,7 +132,7 @@ export const ImagePage = () => {
             </div>
             <div className='left-bar'>
                 <div>
-                    <div style={{ textAlign: 'center', fontSize: '120%' }}>Comments</div>
+                    <div style={{ textAlign: 'center', fontSize: '120%', userSelect: 'none', marginTop: '10px' }}>Comments</div>
                     <div className='comment-items'>
                         {
                             comments.map(comment => {

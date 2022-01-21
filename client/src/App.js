@@ -12,6 +12,7 @@ import { UploadPage } from "./pages/UploadPage";
 import { SigninPage } from './pages/SigninPage';
 import { SignupPage } from './pages/SignupPage';
 import { ImagePage } from './pages/ImagePage';
+import { ProfilePage } from './pages/ProfilePage';
 
 function App() {
     const [socket, setSocket] = useState(false)
@@ -90,6 +91,7 @@ function App() {
                             <Route exact path='/signin' element={<SigninPage />} />
                             <Route exact path='/signup' element={<SignupPage />} />
                             <Route exact path='/image' element={<ImagePage />} />
+                            <Route exact path='/account' element={<ProfilePage />} />
                         </Routes>
                         :
                         <LoaderScreenCentered />

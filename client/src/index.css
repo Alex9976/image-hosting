@@ -17,6 +17,21 @@
     align-content: flex-start;
 }
 
+.user-collection {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.user-image-collection {
+    display: flex;
+    flex-wrap: wrap;
+    width: 50%;
+    height: 100vh;
+    overflow: scroll;
+    align-content: flex-start;
+}
+
 .image-collection-item {
     width: 20vw;
     height: 20vw;
@@ -60,6 +75,7 @@
     justify-content: space-between;
     margin-bottom: -5px;
 }
+
 .add-comment-area {
     display: flex;
     flex-direction: row;

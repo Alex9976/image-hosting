@@ -307,6 +307,67 @@ async function start() {
                 }
             })
 
+            socket.on('get_uploaded_images', async (data) => {
+                if (data) {
+                    let { jwt } = data
+                    let decoded = verifyJwt(jwt)
+                    if (decoded) {
+                        try {
+                            const images = await Image.find({ authorId: decoded.userId })
+                            socket.emit('get_uploaded_images_result', { images })
+                        } catch (e) {
+                            socket.emit('auth_result', { error: 'Invalid user id in jwt' })
+                        }
+                    } else {
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    }
+                } else {
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                }
+            })
+
+            socket.on('get_liked_images', async (data) => {
+                if (data) {
+                    let { jwt } = data
+                    let decoded = verifyJwt(jwt)
+                    if (decoded) {
+                        try {
+                            const user = await User.findById(decoded.userId)
+                            const ids = user.likedImagesId
+
+                            const images = await Image.find({ '_id': { $in: ids } })
+
+                            socket.emit('get_liked_images_result', { images })
+                        } catch (e) {
+                            socket.emit('auth_result', { error: 'Invalid user id in jwt' })
+                        }
+                    } else {
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    }
+                } else {
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                }
+            })
+
+            socket.on('get_user', async (data) => {
+                if (data) {
+                    let { jwt } = data
+                    let decoded = verifyJwt(jwt)
+                    if (decoded) {
+                        try {
+                            const user = await User.findById(decoded.userId)
+                            socket.emit('get_user_result', { user })
+                        } catch (e) {
+                            socket.emit('auth_result', { error: 'Invalid user id in jwt' })
+                        }
+                    } else {
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                    }
+                } else {
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
+                }
+            })
+
             setInterval(async function updateImg() {
                 let images = await Image.find({})
                 socket.broadcast.emit('get_images_result', { images: images })
