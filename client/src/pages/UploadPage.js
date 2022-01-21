@@ -8,9 +8,6 @@ export const UploadPage = () => {
     const authContext = useContext(AppContext)
 
     const [loading, setLoading] = useState(false);
-    const [file, setFile] = useState();
-    const [fileName, setFilename] = useState();
-
     const [fileTitle, setFileTitle] = useState('');
     const [selectedFile, setSelectedFile] = useState(null);
     const [selectedFileName, setSelectedFileName] = useState('');
@@ -21,39 +18,28 @@ export const UploadPage = () => {
     };
 
     const changeFileHandler = (event) => {
-        setSelectedFile(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = function () {
+            const bytes = new Uint8Array(this.result);
+            setSelectedFile(bytes)
+        }
+        reader.readAsArrayBuffer(event.target.files[0]);
         setSelectedFileName(event.target.files[0].name);
     };
 
     const changeFileNameHandler = (event) => {
         setSelectedFileName(event.target.value);
-    };
-
-    useEffect(() => {
-        document.getElementById('file').addEventListener('change', function () {
-
-            const reader = new FileReader();
-            reader.onload = function () {
-                const bytes = new Uint8Array(this.result);
-                setFile(bytes)
-            };
-            setFilename(this.files[0] !== undefined ? this.files[0].name : undefined)
-            reader.readAsArrayBuffer(this.files[0]);
-
-        }, false);
-    })
-
-
-
-
+    }
 
     const handleSubmit = event => {
         event.preventDefault()
         const title = document.getElementById('title').value
         const jwt = getCookie('jwt')
+        const file = selectedFile
+        const fileName = selectedFileName
         console.log({ jwt, fileName, title, file })
         authContext.socket.emit('upload_image', { jwt, fileName, title, file })
-    };
+    }
 
     return (
         <div className="row" style={{ paddingTop: '64px' }}>

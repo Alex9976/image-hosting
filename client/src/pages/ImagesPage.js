@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react'
 import { AppContext } from "../AppContext";
 import { NavLink } from "react-router-dom";
 import { LoaderScreenCentered } from "../components/LoaderScreenCentered";
-import { FcDislike, FcLike } from "react-icons/fc";
 
 export const ImagesPage = () => {
     const authContext = useContext(AppContext)
@@ -23,7 +22,7 @@ export const ImagesPage = () => {
         if (isLoading) {
             fetchImages()
         }
-    }, [isLoading])
+    }, [authContext.socket, isLoading])
 
     if (isLoading) {
         return (
