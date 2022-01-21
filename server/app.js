@@ -8,8 +8,7 @@ const bcrypt = require('bcryptjs')
 const User = require('./models/User')
 const Image = require('./models/Image')
 const Comment = require('./models/Comment')
-const fs = require('file-system');
-const verifyToken = require('./verifyToken.middleware')
+const fs = require('file-system')
 const cors = require('cors')
 
 const app = express()
@@ -127,6 +126,90 @@ async function start() {
                 }
             })
 
+            socket.on('get_image_comments', async (data) => {
+                if (data) {
+                    let { jwt, imageId } = data
+                    const comments = await Comment.find({ imageId })
+                    let decoded = verifyJwt(jwt)
+                    let sendComments = []
+                    if (decoded) {
+                        for (var i = 0; i < comments.length; i++) {
+                            let comment = comments[i]
+                            let user = User.findById(comment.authorId)
+                            var isYouComment = comment.authorId.toString() === decoded.userId
+                            sendComments.push({ comment, username: user.login, isYouComment })
+                        }
+                    }
+                    else {
+                        for (var i = 0; i < comments.length; i++) {
+                            let comment = comments[i]
+
+                            let user = User.findById(comment.authorId)
+                            var isYouComment = false
+                            sendComments.push({ comment, username: user.login, isYouComment })
+                        }
+                    }
+
+                    socket.emit('get_comments_result', sendComments)
+                }
+            })
+
+            socket.on('add_comment', async (data) => {
+                if (data) {
+                    let { jwt, id, commentText } = data
+                    let decoded = verifyJwt(jwt)
+                    let image = await Image.findById(id)
+                    if (decoded) {
+                        let user = await User.findById(decoded.userId)
+                        let text = commentText
+                        let imageId = image._id
+                        let authorId = user._id
+                        const comment = new Comment({
+                            text,
+                            imageId,
+                            authorId
+                        })
+
+                        await comment.save()
+
+                        let sendComments = []
+                        const comments = await Comment.find({ imageId })
+                        for (var i = 0; i < comments.length; i++) {
+                            let comment = comments[i]
+
+                            let user = User.findById(comment.authorId)
+                            var isYouComment = comment.authorId.toString() === decoded.userId
+                            sendComments.push({ comment, username: user.login, isYouComment })
+                        }
+                        socket.emit('get_comments_result', sendComments)
+                    }
+                }
+            })
+
+            socket.on('delete_comment', async (data) => {
+                if (data) {
+                    let { jwt, id, imageId } = data
+                    let decoded = verifyJwt(jwt)
+                    let comment = await Comment.findById(id)
+                    if (decoded) {
+                        if (decoded.userId === comment.authorId.toString()) {
+                            await Comment.findByIdAndDelete(comment._id)
+                        }
+
+                        let sendComments = []
+                        const comments = await Comment.find({ imageId })
+                        for (var i = 0; i < comments.length; i++) {
+                            let comment = comments[i]
+
+                            let user = User.findById(comment.authorId)
+                            var isYouComment = comment.authorId.toString() === decoded.userId
+                            sendComments.push({ comment, username: user.login, isYouComment })
+                        }
+                        socket.emit('get_comments_result', sendComments)
+                    }
+                }
+            })
+
             socket.on('image_like', async (data) => {
                 if (data) {
                     let { id, jwt } = data
@@ -188,8 +271,10 @@ async function start() {
 
                             const users = await User.find({ likedImagesId: id })
 
+                            await Comment.deleteMany({ imageId: id })
+
                             for (var i = 0; i < users.length; i++) {
-                                const user = users[0]
+                                const user = users[i]
 
                                 var likedImagesByUser = user.likedImagesId
                                 likedImagesByUser.splice(likedImagesByUser.indexOf(id), 1)
@@ -222,37 +307,10 @@ async function start() {
                 }
             })
 
-            socket.on('upload_image', async (data) => {
-                let { jwt, fileName, title, file } = data
-                let decoded = verifyJwt(jwt)
-                const fName = fileName
-                if (decoded) {
-                    const user = await User.findById(decoded.userId)
-                    const buffer = Buffer.from(file);
-                    const date = new Date().toLocaleString().replaceAll(':', '.').replaceAll(' ', '')
-                    const uploadDate = new Date().toISOString()
-                    const extention = fName.substring(fName.lastIndexOf('.'))
-                    const imageName = date + getRandomString(20) + extention
-
-                    await fs.writeFile(path.join('./images/', imageName), buffer, function (err) {
-                        if (err) {
-                            return console.log(err);
-                        }
-                    })
-
-                    const image = new Image({
-                        title,
-                        imageName,
-                        uploadDate,
-                        authorId: user.id
-                    })
-
-                    await image.save()
-
-                    let images = await Image.find({})
-                    socket.broadcast.emit('get_images_result', { images: images })
-                }
-            })
+            setInterval(async function updateImg() {
+                let images = await Image.find({})
+                socket.broadcast.emit('get_images_result', { images: images })
+            }, 5000);
         })
 
         io.on('disconnect', async () => {

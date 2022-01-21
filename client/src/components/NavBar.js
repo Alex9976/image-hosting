@@ -15,7 +15,7 @@ export const NavBar = () => {
         <nav style={{ position: 'fixed', left: '0', top: '0' }}>
             <div className="nav-wrapper" style={{ padding: '0 2rem', background: '#202020' }}>
                 <span className="brand-logo"><NavLink to={'/'}><i className="material-icons">camera</i></NavLink></span>
-                {(authContext.isAuthenticated)
+                {(authContext.isAuthenticated && authContext.isReady)
                     ?
                     <ul id="nav-mobile" className="right hide-on-med-and-down">
                         <li style={location === '/account' ? { background: '#FF9F5E' } : {}}><NavLink to={'/account'}><i className="material-icons">account_circle</i></NavLink></li>
@@ -23,7 +23,7 @@ export const NavBar = () => {
                         <li><a href='/' onClick={logoutHandler}><i className="material-icons">logout</i></a></li>
                     </ul>
                     :
-                    location !== '/auth' ?
+                    (location !== '/auth' && authContext.isReady) ?
                         <ul id="nav-mobile" className="right hide-on-med-and-down">
                             <li style={location === '/signin' ? { background: '#FF9F5E' } : {}}><NavLink to={'/signin'}><i className="material-icons">login</i></NavLink></li>
                             <li style={location === '/signup' ? { background: '#FF9F5E' } : {}}><NavLink to={'/signup'}><i className="material-icons"><span className="material-icons-outlined">

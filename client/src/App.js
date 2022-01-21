@@ -13,13 +13,11 @@ import { SigninPage } from './pages/SigninPage';
 import { SignupPage } from './pages/SignupPage';
 import { ImagePage } from './pages/ImagePage';
 
-const socket_p = 'socket';
-
 function App() {
     const [socket, setSocket] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [isReady, setIsReady] = useState(false)
-    const [images, setImages] = useState([])
+
     const message = useMessage()
 
     const signUp = (email, login, password) => {
@@ -70,25 +68,13 @@ function App() {
                 }
                 setIsReady(true)
             })
-
-            socket.on('get_images_result', (data) => {
-                if (JSON.stringify(data)) {
-                    let error = data.error
-                    if (error) {
-                        console.log(error)
-                    } else {
-                        setImages(data.images)
-                    }
-                } else {
-                    message('Invalid auth_result data')
-                }
-            })
         }
-    }, [socket_p])
+    }, [isReady, message])
 
     return (
         <AppContext.Provider value={{
             isAuthenticated,
+            isReady,
             signUp,
             signIn,
             signOut,

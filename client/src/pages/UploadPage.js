@@ -1,7 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { AppContext } from "../AppContext";
 import { Loader } from "../components/Loader";
-import { getCookie } from "../CookieAssistant";
 
 
 export const UploadPage = () => {
@@ -18,12 +17,6 @@ export const UploadPage = () => {
     };
 
     const changeFileHandler = (event) => {
-        // const reader = new FileReader();
-        // reader.onload = function () {
-        //     const bytes = new Uint8Array(this.result);
-        //     setSelectedFile(bytes)
-        // }
-        // reader.readAsArrayBuffer(event.target.files[0]);
         setSelectedFile(event.target.files[0])
         setSelectedFileName(event.target.files[0].name);
     };
@@ -31,16 +24,6 @@ export const UploadPage = () => {
     const changeFileNameHandler = (event) => {
         setSelectedFileName(event.target.value);
     }
-
-    // const handleSubmit = event => {
-    //     event.preventDefault()
-    //     const title = document.getElementById('title').value
-    //     const jwt = getCookie('jwt')
-    //     const file = selectedFile
-    //     const fileName = selectedFileName
-    //     console.log({ jwt, fileName, title, file })
-    //     authContext.socket.emit('upload_image', { jwt, fileName, title, file })
-    // }
 
     const handleSubmit = event => {
         event.preventDefault()

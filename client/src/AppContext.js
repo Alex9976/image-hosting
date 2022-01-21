@@ -5,6 +5,7 @@ function nothing() { }
 
 export const AppContext = createContext({
     isAuthenticated: false,
+    isReady: false,
     signUp: nothing,
     signIn: nothing,
     signOut: nothing,

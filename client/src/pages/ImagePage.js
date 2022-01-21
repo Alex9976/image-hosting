@@ -18,10 +18,24 @@ export const ImagePage = () => {
 
     const [isLoading, setIsLoading] = useState(true)
     const [isLiked, setIsLiked] = useState(false)
-    const [isDeleting, setIsDeleting] = useState(false)
     const [isAuth, setIsAuth] = useState(false)
     const [isCanDelete, setIsCanDelete] = useState(false)
     const [image, setImage] = useState(null)
+    const [comments, setComments] = useState([])
+    const [commentText, setCommentText] = useState('')
+
+    const changeHandler = event => {
+        setCommentText(event.target.value)
+    }
+
+    const sendHandler = async () => {
+        if (commentText !== '') {
+            let jwt = getCookie('jwt')
+            let id = image._id
+            authContext.socket.emit('add_comment', { jwt, id, commentText })
+            setCommentText('')
+        }
+    }
 
     const deleteImage = () => {
         async function deleteAsync() {
@@ -34,11 +48,19 @@ export const ImagePage = () => {
                 history.push('/')
             })
         }
+        deleteAsync()
+    }
 
-        if (!isDeleting) {
-            setIsDeleting(true);
-            deleteAsync()
+    const deleteComment = (id) => {
+        async function deleteAsync() {
+            let jwt = getCookie('jwt')
+            let imageId = image._id
+
+            authContext.socket.emit('delete_comment', { jwt, id, imageId })
         }
+
+        deleteAsync()
+
     }
 
     const likeImage = () => {
@@ -65,6 +87,8 @@ export const ImagePage = () => {
 
             authContext.socket.emit('get_image', { jwt, imageId })
 
+            authContext.socket.emit('get_image_comments', { jwt, imageId })
+
             authContext.socket.on('get_image_result', (data) => {
                 if (data.image) {
                     setLikes(data.image.likes)
@@ -75,14 +99,18 @@ export const ImagePage = () => {
                     setIsLoading(false)
                 }
             })
+
+            authContext.socket.on('get_comments_result', (data) => {
+                setComments(data)
+            })
         }
 
         if (isLoading) {
             fetchImage()
         }
-    }, [query])
+    }, [authContext.socket, isLoading, query])
 
-    if (isLoading || isDeleting || !image) {
+    if (isLoading || !image) {
         return (
             <LoaderScreenCentered />
         )
@@ -102,7 +130,34 @@ export const ImagePage = () => {
                     </div>
                 </div>
             </div>
-            <div className="left-bar">Comments</div>
+            <div className='left-bar'>
+                <div>
+                    <div style={{ textAlign: 'center', fontSize: '120%' }}>Comments</div>
+                    <div className='comment-items'>
+                        {
+                            comments.map(comment => {
+                                return (
+                                    <div key={comment.comment._id} className='comment-item'>
+                                        <div className='comment-info'>
+                                            <div>{(comment.isYouComment) ? 'You' : comment.username}</div>
+                                            {comment.isYouComment ? <div style={{ cursor: 'pointer', fontSize: '110%', marginTop: '3px' }} onClick={(e) => { deleteComment(comment.comment._id) }}><RiDeleteBinLine /></div> : ''}
+                                        </div>
+                                        <div>{comment.comment.text}</div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+                {
+                    (isAuth) ? <div className='add-comment-area'>
+                        <div className="input-field" style={{ width: '80%' }}>
+                            <input id="text" type="text" name="text" value={commentText} onChange={changeHandler} style={{ color: 'white' }} />
+                        </div>
+                        <a href="#!" onClick={sendHandler} className="waves-effect waves-circle waves-light btn-floating secondary-content"><i className="material-icons" style={{ margin: '-2px 2px' }}>send</i></a>
+                    </div> : ''
+                }
+            </div>
         </div >
     )
 }
