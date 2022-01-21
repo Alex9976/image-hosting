@@ -9,10 +9,14 @@ const User = require('./models/User')
 const Image = require('./models/Image')
 const Comment = require('./models/Comment')
 const fs = require('file-system');
+const verifyToken = require('./verifyToken.middleware')
+const cors = require('cors')
 
 const app = express()
 const port = config.get('port') || 5000
 const dbUrl = config.get('mongoUri')
+app.use(cors())
+app.use('/api/upload', require('./routes/upload.routes'))
 
 async function start() {
     try {
@@ -99,6 +103,7 @@ async function start() {
                     let { jwt, imageId } = data
                     var isLiked = false
                     var isAuth = false
+                    var isCanDelete = false
                     let image = await Image.findById(imageId)
                     if (jwt) {
                         let decoded = verifyJwt(jwt)
@@ -110,11 +115,14 @@ async function start() {
                             if (index !== -1) {
                                 isLiked = true
                             }
-                            socket.emit('get_image_result', { image, isLiked, isAuth })
+                            if (decoded.userId === image.authorId.toString()) {
+                                isCanDelete = true
+                            }
+                            socket.emit('get_image_result', { image, isLiked, isAuth, isCanDelete })
                         }
                     }
                     else {
-                        socket.emit('get_image_result', { image, isLiked, isAuth })
+                        socket.emit('get_image_result', { image, isLiked, isAuth, isCanDelete })
                     }
                 }
             })
@@ -278,8 +286,9 @@ function verifyJwt(token) {
 
 start()
 
-app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/images/' + req.originalUrl)
+app.get('/file/:id', async (req, res) => {
+    const image = await Image.findById(req.params.id)
+    res.sendFile(__dirname + '/images/' + image.imageName)
 })
 
 function getRandomString(length) {

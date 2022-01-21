@@ -13,7 +13,7 @@ export const NavBar = () => {
     const location = useLocation().pathname
     return (
         <nav style={{ position: 'fixed', left: '0', top: '0' }}>
-            <div className="nav-wrapper" style={{ padding: '0 2rem', background: '#876191' }}>
+            <div className="nav-wrapper" style={{ padding: '0 2rem', background: '#202020' }}>
                 <span className="brand-logo"><NavLink to={'/'}><i className="material-icons">camera</i></NavLink></span>
                 {(authContext.isAuthenticated)
                     ?

@@ -18,12 +18,13 @@ export const UploadPage = () => {
     };
 
     const changeFileHandler = (event) => {
-        const reader = new FileReader();
-        reader.onload = function () {
-            const bytes = new Uint8Array(this.result);
-            setSelectedFile(bytes)
-        }
-        reader.readAsArrayBuffer(event.target.files[0]);
+        // const reader = new FileReader();
+        // reader.onload = function () {
+        //     const bytes = new Uint8Array(this.result);
+        //     setSelectedFile(bytes)
+        // }
+        // reader.readAsArrayBuffer(event.target.files[0]);
+        setSelectedFile(event.target.files[0])
         setSelectedFileName(event.target.files[0].name);
     };
 
@@ -31,14 +32,39 @@ export const UploadPage = () => {
         setSelectedFileName(event.target.value);
     }
 
+    // const handleSubmit = event => {
+    //     event.preventDefault()
+    //     const title = document.getElementById('title').value
+    //     const jwt = getCookie('jwt')
+    //     const file = selectedFile
+    //     const fileName = selectedFileName
+    //     console.log({ jwt, fileName, title, file })
+    //     authContext.socket.emit('upload_image', { jwt, fileName, title, file })
+    // }
+
     const handleSubmit = event => {
         event.preventDefault()
-        const title = document.getElementById('title').value
-        const jwt = getCookie('jwt')
-        const file = selectedFile
-        const fileName = selectedFileName
-        console.log({ jwt, fileName, title, file })
-        authContext.socket.emit('upload_image', { jwt, fileName, title, file })
+
+        const data = new FormData();
+        data.append("title", fileTitle);
+        data.append("image", selectedFile);
+
+        setLoading(true)
+
+        fetch('/api/upload', {
+            method: 'POST',
+            body: data
+        }).then(() => {
+            console.log('a')
+            setFileTitle('')
+            setSelectedFile(null)
+            setSelectedFileName('');
+            fileInputRef.current.value = ""
+            setLoading(false)
+        }).catch(() => {
+            authContext.signOut()
+            setLoading(false)
+        })
     }
 
     return (

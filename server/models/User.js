@@ -19,6 +19,11 @@ const schema = new Schema({
         type: Types.ObjectId,
         ref: 'Image'
     }],
+    createDate: {
+        type: Date,
+        required: true,
+        default: new Date().toISOString()
+    },
 })
 
 module.exports = model('User', schema)

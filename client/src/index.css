@@ -48,6 +48,15 @@
     display: flex;
 }
 
+.util-item {
+    user-select: none;
+    margin-right: 5px;
+    font-size: 120%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .img-title {
     font-size: 1.5em;
     margin-top: -5px;
@@ -89,4 +98,6 @@
 
 body {
     overflow: hidden;
+    background-color: #181818;
+    color: white;
 }

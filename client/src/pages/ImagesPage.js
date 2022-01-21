@@ -37,8 +37,8 @@ export const ImagesPage = () => {
                     images.map(image => {
                         return (
                             <NavLink key={image._id} className="collection-item" to={`/image?id=${image._id}`}>
-                                <div className="image-collection-item-bg">
-                                    <div className="image-collection-item" style={{ backgroundImage: `url(http://localhost:3000/${image.imageName}` }}></div>
+                                <div className="hoverable">
+                                    <div className="image-collection-item" style={{ backgroundImage: `url(/file/${image._id}` }}></div>
                                 </div>
                             </NavLink>
                         )

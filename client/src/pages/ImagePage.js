@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { AppContext } from "../AppContext";
 import { LoaderScreenCentered } from "../components/LoaderScreenCentered";
 import { getCookie } from "../CookieAssistant";
-import { FcLike } from "react-icons/fc";
+import { FcLike, FcLikePlaceholder } from "react-icons/fc";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 export const ImagePage = () => {
@@ -20,6 +20,7 @@ export const ImagePage = () => {
     const [isLiked, setIsLiked] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
     const [isAuth, setIsAuth] = useState(false)
+    const [isCanDelete, setIsCanDelete] = useState(false)
     const [image, setImage] = useState(null)
 
     const deleteImage = () => {
@@ -53,6 +54,7 @@ export const ImagePage = () => {
             })
         }
 
+        setIsLiked(!isLiked)
         likeAsync()
     }
 
@@ -69,6 +71,7 @@ export const ImagePage = () => {
                     setImage(data.image)
                     setIsLiked(data.isLiked)
                     setIsAuth(data.isAuth)
+                    setIsCanDelete(data.isCanDelete)
                     setIsLoading(false)
                 }
             })
@@ -88,14 +91,14 @@ export const ImagePage = () => {
     return (
         <div className='img-window'>
             <div>
-                <div className="image-file" style={{ backgroundImage: `url(http://localhost:3000/${image.imageName}` }}>
+                <div className="image-file" style={{ backgroundImage: `url(/file/${image._id}` }}>
                 </div>
                 <div className="image-info">
                     <div className='img-title'>{image.title}</div>
                     <div className='image-utils'>
-                        <div style={{ marginRight: '5px' }} onClick={(e) => { deleteImage() }}><RiDeleteBinLine /></div>
-                        <div onClick={(e) => { likeImage() }} style={{ marginRight: '5px' }}><FcLike /></div>
-                        <div>{likes.toString()}</div>
+                        <div className='util-item' style={{ cursor: 'pointer' }} onClick={(e) => { likeImage() }}>{(isLiked) ? <FcLike /> : <FcLikePlaceholder />}</div>
+                        <div className='util-item' style={{ marginRight: '15px' }}>{likes.toString()}</div>
+                        {(isCanDelete) ? <div className='util-item' style={{ cursor: 'pointer' }} onClick={(e) => { deleteImage() }}><RiDeleteBinLine /></div> : ''}
                     </div>
                 </div>
             </div>
