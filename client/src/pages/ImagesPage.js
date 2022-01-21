@@ -12,12 +12,12 @@ export const ImagesPage = () => {
     useEffect(() => {
         async function fetchImages() {
             authContext.socket.emit('get_images', '')
-
-            authContext.socket.on('get_images_result', (data) => {
-                setImages(data.images)
-                setIsLoading(false)
-            })
         }
+
+        authContext.socket.on('get_images_result', (data) => {
+            setImages(data.images)
+            setIsLoading(false)
+        })
 
         if (isLoading) {
             fetchImages()

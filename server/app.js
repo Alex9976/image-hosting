@@ -53,11 +53,13 @@ async function start() {
 
                 if (await User.findOne({ email })) {
                     socket.emit('auth_result', { error: 'User with that email already exists', type: 'signUp' })
+                    socket.emit('sign_up_result', { error: 'User with that email already exists' })
                     return
                 }
 
                 if (await User.findOne({ login })) {
                     socket.emit('auth_result', { error: 'User with that login already exists', type: 'signUp' })
+                    socket.emit('sign_up_result', { error: 'User with that login already exists' })
                     return
                 }
 
@@ -71,6 +73,7 @@ async function start() {
                 await user.save()
                 const jwt = createToken(user)
                 socket.emit('auth_result', { jwt })
+                socket.emit('sign_up_result', 'success')
             })
 
             socket.on('sign_in', async (data) => {
@@ -79,17 +82,20 @@ async function start() {
                 const user = await User.findOne({ login })
                 if (!user) {
                     socket.emit('auth_result', { error: 'User does not exist', type: 'signIn' })
+                    socket.emit('sign_in_result', { error: 'User does not exist' })
                     return
                 }
 
                 const isMatch = await bcrypt.compare(password, user.hashedPassword)
                 if (!isMatch) {
                     socket.emit('auth_result', { error: 'Invalid password', type: 'signIn' })
+                    socket.emit('sign_in_result', { error: 'Invalid password' })
                     return
                 }
 
                 const jwt = createToken(user)
                 socket.emit('auth_result', { jwt })
+                socket.emit('sign_in_result', 'success')
             })
 
             socket.on('get_images', async () => {

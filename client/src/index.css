@@ -147,3 +147,13 @@ body {
     background-color: #181818;
     color: white;
 }
+
+input {
+    outline: none;
+}
+
+input:-webkit-autofill {
+    box-shadow: inset 0 0 0 50px #202020!important;
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+}
