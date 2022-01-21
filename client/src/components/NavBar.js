@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AppContext } from "../AppContext";
 
 export const NavBar = () => {
@@ -7,9 +7,10 @@ export const NavBar = () => {
 
     const logoutHandler = async (event) => {
         event.preventDefault()
+        navigate('/')
         authContext.signOut()
     }
-
+    const navigate = useNavigate()
     const location = useLocation().pathname
     return (
         <nav style={{ position: 'fixed', left: '0', top: '0' }}>

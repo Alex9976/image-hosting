@@ -24,7 +24,6 @@ export const ProfilePage = () => {
         authContext.socket.emit('get_uploaded_images', { jwt })
 
         authContext.socket.on('get_uploaded_images_result', (data) => {
-            console.log(data)
             setUploadedImages(data.images)
             setIsLoadingUploaded(false)
         })

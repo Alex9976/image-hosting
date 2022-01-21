@@ -1,8 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { AppContext } from "../AppContext";
+import { useNavigate } from 'react-router-dom'
 
 export const SignupPage = () => {
     const authContext = useContext(AppContext)
+    const navigate = useNavigate()
 
     const [form, setForm] = useState({
         email: '',
@@ -32,11 +34,11 @@ export const SignupPage = () => {
                 setErrorMessage(data.error)
             }
             else {
-                console.log('need to redirect')
+                navigate(-1)
             }
         })
 
-    }, [authContext.socket])
+    }, [authContext.socket, navigate])
 
     return (
         <div className="row" style={{ paddingTop: '64px' }}>

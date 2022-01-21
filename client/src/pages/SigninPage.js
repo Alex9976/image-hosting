@@ -1,8 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppContext } from "../AppContext";
 
 export const SigninPage = () => {
     const authContext = useContext(AppContext)
+    const navigate = useNavigate()
 
     const [form, setForm] = useState({
         login: '',
@@ -31,11 +33,10 @@ export const SigninPage = () => {
                 setErrorMessage(data.error)
             }
             else {
-                console.log('need to redirect')
+                navigate(-1)
             }
         })
-
-    }, [authContext.socket])
+    }, [authContext.socket, navigate])
 
     return (
         <div className="row" style={{ paddingTop: '64px' }}>
