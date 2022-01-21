@@ -61,9 +61,7 @@ export const SignupPage = () => {
                         <label style={{ userSelect: 'none', color: 'red', fontSize: '100%' }}>{errorMessage}</label>
                     </div>
                     <div className="card-action">
-                        <button className="btn" style={{ marginRight: 10, background: '#FF9F5E', color: 'black' }} onClick={signupHandler} disabled={authContext.isLoading}>
-                            Sign In
-                        </button>
+                        <button className="btn" style={{ marginRight: 10, background: '#FF9F5E', color: 'black' }} onClick={signupHandler} disabled={authContext.isLoading}>Sign Up</button>
                     </div>
                 </div>
             </div>
