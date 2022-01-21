@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { AppContext } from "../AppContext";
-import { NavLink } from "react-router-dom";
-import { LoaderScreenCentered } from "../components/LoaderScreenCentered";
+import { AppContext } from "../AppContext"
+import { NavLink } from "react-router-dom"
+import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
 
 export const ImagesPage = () => {
     const authContext = useContext(AppContext)
@@ -10,18 +10,22 @@ export const ImagesPage = () => {
     const [images, setImages] = useState([])
 
     useEffect(() => {
+        let cleanupFunction = false;
+
         async function fetchImages() {
             authContext.socket.emit('get_images', '')
         }
 
         authContext.socket.on('get_images_result', (data) => {
-            setImages(data.images)
+            if (!cleanupFunction) setImages(data.images)
             setIsLoading(false)
         })
 
         if (isLoading) {
             fetchImages()
         }
+
+        return () => cleanupFunction = true;
     }, [authContext.socket, isLoading])
 
     if (isLoading) {

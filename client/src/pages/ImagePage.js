@@ -1,21 +1,17 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { useNavigate, useLocation } from "react-router-dom";
-import { AppContext } from "../AppContext";
-import { LoaderScreenCentered } from "../components/LoaderScreenCentered";
-import { getCookie } from "../CookieAssistant";
-import { FcLike, FcLikePlaceholder } from "react-icons/fc";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { useNavigate, useLocation } from "react-router-dom"
+import { AppContext } from "../AppContext"
+import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
+import { getCookie } from "../CookieAssistant"
+import { FcLike, FcLikePlaceholder } from "react-icons/fc"
+import { RiDeleteBinLine } from "react-icons/ri"
 
 export const ImagePage = () => {
-
-    const history = useNavigate();
-
+    const authContext = useContext(AppContext)
+    const history = useNavigate()
     const query = new URLSearchParams(useLocation().search)
 
-    const authContext = useContext(AppContext)
-
     const [likes, setLikes] = useState(-1)
-
     const [isLoading, setIsLoading] = useState(true)
     const [isLiked, setIsLiked] = useState(false)
     const [isAuth, setIsAuth] = useState(false)
@@ -81,6 +77,8 @@ export const ImagePage = () => {
     }
 
     useEffect(() => {
+        let cleanupFunction = false;
+
         async function fetchImage() {
             const imageId = query.get('id')
             let jwt = getCookie('jwt')
@@ -90,7 +88,7 @@ export const ImagePage = () => {
             authContext.socket.emit('get_image_comments', { jwt, imageId })
 
             authContext.socket.on('get_image_result', (data) => {
-                if (data.image) {
+                if (data.image && !cleanupFunction) {
                     setLikes(data.image.likes)
                     setImage(data.image)
                     setIsLiked(data.isLiked)
@@ -101,13 +99,15 @@ export const ImagePage = () => {
             })
 
             authContext.socket.on('get_comments_result', (data) => {
-                setComments(data)
+                if (!cleanupFunction) setComments(data)
             })
         }
 
         if (isLoading) {
             fetchImage()
         }
+
+        return () => cleanupFunction = true;
     }, [authContext.socket, isLoading, query])
 
     if (isLoading || !image) {

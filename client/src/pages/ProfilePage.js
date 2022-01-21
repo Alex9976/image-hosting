@@ -1,16 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { AppContext } from "../AppContext";
-import { LoaderScreenCentered } from "../components/LoaderScreenCentered";
-import { getCookie } from "../CookieAssistant";
-import { NavLink } from "react-router-dom";
-import { FcLike } from "react-icons/fc";
-import { Loader } from "../components/Loader";
+import { AppContext } from "../AppContext"
+import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
+import { getCookie } from "../CookieAssistant"
+import { NavLink } from "react-router-dom"
 
 export const ProfilePage = () => {
     const authContext = useContext(AppContext)
-
-    const [isLoadingUploaded, setIsLoadingUploaded] = useState(true)
-    const [isLoadingLiked, setIsLoadingLiked] = useState(true)
 
     const [isLoading, setIsLoading] = useState(true)
     const [user, setUser] = useState(null)
@@ -18,26 +13,22 @@ export const ProfilePage = () => {
     const [likedImages, setLikedImages] = useState([])
 
     const getUploadedImages = () => {
-        setIsLoadingUploaded(true)
 
         let jwt = getCookie('jwt')
         authContext.socket.emit('get_uploaded_images', { jwt })
 
         authContext.socket.on('get_uploaded_images_result', (data) => {
             setUploadedImages(data.images)
-            setIsLoadingUploaded(false)
         })
     }
 
     const getLikedImages = () => {
-        setIsLoadingLiked(true)
 
         let jwt = getCookie('jwt')
         authContext.socket.emit('get_liked_images', { jwt })
 
         authContext.socket.on('get_liked_images_result', (data) => {
             setLikedImages(data.images)
-            setIsLoadingLiked(false)
         })
     }
 

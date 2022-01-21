@@ -1,18 +1,18 @@
-import React, { Fragment } from 'react';
+import React, { Fragment } from 'react'
 import { useState, useEffect } from 'react'
-import { AppContext } from "./AppContext";
-import { getCookie, eraseCookie, setCookie } from './CookieAssistant';
-import { useMessage } from "./hook";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { io } from "socket.io-client";
-import { LoaderScreenCentered } from "./components/LoaderScreenCentered";
-import { ImagesPage } from "./pages/ImagesPage";
-import { NavBar } from "./components/NavBar";
-import { UploadPage } from "./pages/UploadPage";
-import { SigninPage } from './pages/SigninPage';
-import { SignupPage } from './pages/SignupPage';
-import { ImagePage } from './pages/ImagePage';
-import { ProfilePage } from './pages/ProfilePage';
+import { AppContext } from "./AppContext"
+import { getCookie, eraseCookie, setCookie } from './CookieAssistant'
+import { useMessage } from "./hook"
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+import { io } from "socket.io-client"
+import { LoaderScreenCentered } from "./components/LoaderScreenCentered"
+import { ImagesPage } from "./pages/ImagesPage"
+import { NavBar } from "./components/NavBar"
+import { UploadPage } from "./pages/UploadPage"
+import { SigninPage } from './pages/SigninPage'
+import { SignupPage } from './pages/SignupPage'
+import { ImagePage } from './pages/ImagePage'
+import { ProfilePage } from './pages/ProfilePage'
 
 function App() {
     const [socket, setSocket] = useState(false)

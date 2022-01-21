@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AppContext } from "../AppContext";
+import { AppContext } from "../AppContext"
 
 export const SigninPage = () => {
     const authContext = useContext(AppContext)

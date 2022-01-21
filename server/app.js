@@ -14,17 +14,21 @@ const cors = require('cors')
 const app = express()
 const port = config.get('port') || 5000
 const dbUrl = config.get('mongoUri')
+
 app.use(cors())
+
 app.use('/api/upload', require('./routes/upload.routes'))
+
+app.get('/file/:id', async (req, res) => {
+    const image = await Image.findById(req.params.id)
+    res.sendFile(__dirname + '/images/' + image.imageName)
+})
 
 async function start() {
     try {
         console.log(`Connecting to MongoDB with uri ${dbUrl}`)
 
-        await mongoose.connect(dbUrl, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        })
+        await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true, })
 
         const server = app.listen(port, () => {
             console.log(`Listening at port ${port}`)
@@ -41,66 +45,66 @@ async function start() {
                     if (verifyJwt(jwt)) {
                         socket.emit('auth_result', { jwt })
                     } else {
-                        socket.emit('auth_result', { error: 'Unable to verify provided jwt', type: 'auth' })
+                        socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
                     }
                 } else {
-                    socket.emit('auth_result', { error: 'Unable to verify provided jwt', type: 'auth' })
+                    socket.emit('auth_result', { error: 'Unable to verify provided jwt' })
                 }
             })
 
             socket.on('sign_up', async (data) => {
-                const { email, login, password } = data
+                if (data) {
+                    const { email, login, password } = data
 
-                if (await User.findOne({ email })) {
-                    socket.emit('auth_result', { error: 'User with that email already exists', type: 'signUp' })
-                    socket.emit('sign_up_result', { error: 'User with that email already exists' })
-                    return
+                    if (await User.findOne({ email })) {
+                        socket.emit('auth_result', { error: 'User with that email already exists' })
+                        socket.emit('sign_up_result', { error: 'User with that email already exists' })
+                        return
+                    }
+
+                    if (await User.findOne({ login })) {
+                        socket.emit('auth_result', { error: 'User with that login already exists' })
+                        socket.emit('sign_up_result', { error: 'User with that login already exists' })
+                        return
+                    }
+
+                    const hashedPassword = await bcrypt.hash(password, 12)
+                    const user = new User({ email, login, hashedPassword })
+
+                    await user.save()
+                    const jwt = createToken(user)
+                    socket.emit('auth_result', { jwt })
+                    socket.emit('sign_up_result', 'success')
                 }
-
-                if (await User.findOne({ login })) {
-                    socket.emit('auth_result', { error: 'User with that login already exists', type: 'signUp' })
-                    socket.emit('sign_up_result', { error: 'User with that login already exists' })
-                    return
-                }
-
-                const hashedPassword = await bcrypt.hash(password, 12)
-                const user = new User({
-                    email,
-                    login,
-                    hashedPassword
-                })
-
-                await user.save()
-                const jwt = createToken(user)
-                socket.emit('auth_result', { jwt })
-                socket.emit('sign_up_result', 'success')
             })
 
             socket.on('sign_in', async (data) => {
-                const { login, password } = data
+                if (data) {
+                    const { login, password } = data
 
-                const user = await User.findOne({ login })
-                if (!user) {
-                    socket.emit('auth_result', { error: 'User does not exist', type: 'signIn' })
-                    socket.emit('sign_in_result', { error: 'User does not exist' })
-                    return
+                    const user = await User.findOne({ login })
+                    if (!user) {
+                        socket.emit('auth_result', { error: 'User does not exist' })
+                        socket.emit('sign_in_result', { error: 'User does not exist' })
+                        return
+                    }
+
+                    const isMatch = await bcrypt.compare(password, user.hashedPassword)
+                    if (!isMatch) {
+                        socket.emit('auth_result', { error: 'Invalid password' })
+                        socket.emit('sign_in_result', { error: 'Invalid password' })
+                        return
+                    }
+
+                    const jwt = createToken(user)
+                    socket.emit('auth_result', { jwt })
+                    socket.emit('sign_in_result', 'success')
                 }
-
-                const isMatch = await bcrypt.compare(password, user.hashedPassword)
-                if (!isMatch) {
-                    socket.emit('auth_result', { error: 'Invalid password', type: 'signIn' })
-                    socket.emit('sign_in_result', { error: 'Invalid password' })
-                    return
-                }
-
-                const jwt = createToken(user)
-                socket.emit('auth_result', { jwt })
-                socket.emit('sign_in_result', 'success')
             })
 
             socket.on('get_images', async () => {
                 let images = await Image.find({})
-                socket.emit('get_images_result', { images: images })
+                socket.emit('get_images_result', { images })
             })
 
             socket.on('get_image', async (data) => {
@@ -228,10 +232,10 @@ async function start() {
                             var likedImagesByUser = user.likedImagesId
                             var imageLikesCount = image.likes
 
-                            const index = likedImagesByUser.indexOf(id);
+                            const index = likedImagesByUser.indexOf(id)
                             let isLiked = false
                             if (index !== -1) {
-                                likedImagesByUser.splice(index, 1);
+                                likedImagesByUser.splice(index, 1)
                                 imageLikesCount--
                             } else {
                                 isLiked = true
@@ -296,9 +300,9 @@ async function start() {
                             await Image.findOneAndDelete({ _id: id })
 
                             fs.unlink(imageFilePath, function (err) {
-                                if (err) return console.log(err);
-                                console.log(imageFilePath + ' deleted successfully');
-                            });
+                                if (err) return console.log(err)
+                                console.log(imageFilePath + ' deleted successfully')
+                            })
 
                             socket.emit('delete_inage_result', {})
                         }
@@ -377,7 +381,7 @@ async function start() {
             setInterval(async function updateImg() {
                 let images = await Image.find({})
                 socket.broadcast.emit('get_images_result', { images: images })
-            }, 5000);
+            }, 5000)
         })
 
         io.on('disconnect', async () => {
@@ -408,10 +412,5 @@ function verifyJwt(token) {
         return null
     }
 }
-
-app.get('/file/:id', async (req, res) => {
-    const image = await Image.findById(req.params.id)
-    res.sendFile(__dirname + '/images/' + image.imageName)
-})
 
 start()

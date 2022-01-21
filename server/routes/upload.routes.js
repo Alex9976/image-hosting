@@ -1,17 +1,17 @@
 const { Router } = require('express')
 const Image = require('../models/Image')
 const config = require('config')
-const verifyToken = require('../verifyToken.middleware')
+const verifyToken = require('../verifyToken')
 const multer = require('multer')
 const router = Router()
-const path = require("path");
+const path = require("path")
 
 const storageConfig = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, config.get('imageSavePath'));
+        cb(null, config.get('imageSavePath'))
     },
     filename: (req, file, cb) => {
-        cb(null, getRandomString(20) + '-' + Date.now() + path.extname(file.originalname));
+        cb(null, getRandomString(20) + '-' + Date.now() + path.extname(file.originalname))
     }
 })
 
@@ -43,7 +43,7 @@ router.post('/', verifyToken, async function (req, res) {
                 return
             }
 
-            console.log('Successfully received file ' + req.file.filename);
+            console.log('Successfully received file ' + req.file.filename)
 
             const fileName = req.file.filename
             const title = req.body.title
@@ -59,7 +59,7 @@ router.post('/', verifyToken, async function (req, res) {
             res.json({
                 message: "Successfully uploaded file"
             })
-            
+
             return
         })
     } catch (e) {

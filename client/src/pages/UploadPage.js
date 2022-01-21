@@ -1,15 +1,13 @@
-import React, { useContext, useState, useEffect } from 'react'
-import { AppContext } from "../AppContext";
-import { Loader } from "../components/Loader";
+import React, { useContext, useState } from 'react'
+import { AppContext } from "../AppContext"
 
 
 export const UploadPage = () => {
     const authContext = useContext(AppContext)
 
-    const [loading, setLoading] = useState(false);
-    const [fileTitle, setFileTitle] = useState('');
-    const [selectedFile, setSelectedFile] = useState(null);
-    const [selectedFileName, setSelectedFileName] = useState('');
+    const [fileTitle, setFileTitle] = useState('')
+    const [selectedFile, setSelectedFile] = useState(null)
+    const [selectedFileName, setSelectedFileName] = useState('')
     const fileInputRef = React.useRef()
     const [errorMessage, setErrorMessage] = useState('')
     const [successMessage, setSuccessMessage] = useState('')
@@ -17,15 +15,15 @@ export const UploadPage = () => {
     const changeTitleHandler = (event) => {
         setErrorMessage('')
         setSuccessMessage('')
-        setFileTitle(event.target.value);
-    };
+        setFileTitle(event.target.value)
+    }
 
     const changeFileHandler = (event) => {
         setErrorMessage('')
         setSuccessMessage('')
         setSelectedFile(event.target.files[0])
-        setSelectedFileName(event.target.files[0].name);
-    };
+        setSelectedFileName(event.target.files[0].name)
+    }
 
     const changeFileNameHandler = (event) => {
         setErrorMessage('')
@@ -36,11 +34,9 @@ export const UploadPage = () => {
     const handleSubmit = event => {
         event.preventDefault()
 
-        const data = new FormData();
-        data.append("title", fileTitle);
-        data.append("image", selectedFile);
-
-        setLoading(true)
+        const data = new FormData()
+        data.append("title", fileTitle)
+        data.append("image", selectedFile)
 
         fetch('/api/upload', {
             method: 'POST',
@@ -49,13 +45,11 @@ export const UploadPage = () => {
             setSuccessMessage('Success')
             setFileTitle('')
             setSelectedFile(null)
-            setSelectedFileName('');
+            setSelectedFileName('')
             fileInputRef.current.value = ""
-            setLoading(false)
         }).catch(() => {
             setErrorMessage('Error')
             authContext.signOut()
-            setLoading(false)
         })
     }
 
