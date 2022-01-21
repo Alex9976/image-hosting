@@ -409,19 +409,9 @@ function verifyJwt(token) {
     }
 }
 
-start()
-
 app.get('/file/:id', async (req, res) => {
     const image = await Image.findById(req.params.id)
     res.sendFile(__dirname + '/images/' + image.imageName)
 })
 
-function getRandomString(length) {
-    const chars = 'abcdefghijklmnopqrstuvwxzABCDEFGHIJKLMNOPQRSTUVWXZ0123456789'
-    let str = ''
-    for (let i = 0; i < length; i++) {
-        const pos = Math.floor(Math.random() * chars.length)
-        str += chars.substring(pos, pos + 1)
-    }
-    return str
-}
+start()
