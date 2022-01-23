@@ -20,4 +20,23 @@ const verifyToken = async (req, res, next) => {
     }
 }
 
-module.exports = verifyToken
+const createToken = (user) => {
+    return jwt.sign(
+        { userId: user.id },
+        config.get('jwtSecret'),
+        { expiresIn: '1h' }
+    )
+}
+
+const verifyJwt = (token) => {
+    try {
+        if (!token) {
+            return null
+        }
+        return jwt.verify(token, config.get('jwtSecret'))
+    } catch {
+        return null
+    }
+}
+
+module.exports = { verifyToken, createToken, verifyJwt }

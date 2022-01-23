@@ -1,8 +1,8 @@
 import React, { Fragment } from 'react'
 import { useState, useEffect } from 'react'
-import { AppContext } from "./AppContext"
-import { getCookie, eraseCookie, setCookie } from './CookieAssistant'
-import { useMessage } from "./hook"
+import { AppContext } from "./context/AppContext"
+import { getCookie, eraseCookie, setCookie } from './helpers/CookieAssistant'
+import { useMessage } from "./hooks/message.hook"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 import { io } from "socket.io-client"
 import { LoaderScreenCentered } from "./components/LoaderScreenCentered"

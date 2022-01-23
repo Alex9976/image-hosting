@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const Image = require('../models/Image')
 const config = require('config')
-const verifyToken = require('../verifyToken')
+const { verifyToken } = require('../helpers/TokenAssistant')
 const multer = require('multer')
 const router = Router()
 const path = require("path")

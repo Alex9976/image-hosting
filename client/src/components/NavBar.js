@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { AppContext } from "../AppContext"
+import { AppContext } from "../context/AppContext"
 
 export const NavBar = () => {
     const authContext = useContext(AppContext)

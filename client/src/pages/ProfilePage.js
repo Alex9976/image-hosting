@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { AppContext } from "../AppContext"
+import { AppContext } from "../context/AppContext"
 import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
-import { getCookie } from "../CookieAssistant"
+import { getCookie } from "../helpers/CookieAssistant"
 import { NavLink } from "react-router-dom"
 
 export const ProfilePage = () => {

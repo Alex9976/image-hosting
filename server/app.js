@@ -3,7 +3,7 @@ const path = require('path')
 const config = require('config')
 const mongoose = require('mongoose')
 const socket = require('socket.io')
-const jwt = require('jsonwebtoken')
+const { createToken, verifyJwt } = require('./helpers/TokenAssistant')
 const bcrypt = require('bcryptjs')
 const User = require('./models/User')
 const Image = require('./models/Image')
@@ -391,25 +391,6 @@ async function start() {
     } catch (e) {
         console.log(`Server error: ${e.message}`)
         process.exit(1)
-    }
-}
-
-function createToken(user) {
-    return jwt.sign(
-        { userId: user.id },
-        config.get('jwtSecret'),
-        { expiresIn: '1h' }
-    )
-}
-
-function verifyJwt(token) {
-    try {
-        if (!token) {
-            return null
-        }
-        return jwt.verify(token, config.get('jwtSecret'))
-    } catch {
-        return null
     }
 }
 

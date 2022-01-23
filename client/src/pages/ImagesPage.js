@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react'
-import { AppContext } from "../AppContext"
+import { AppContext } from "../context/AppContext"
 import { NavLink } from "react-router-dom"
 import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
 

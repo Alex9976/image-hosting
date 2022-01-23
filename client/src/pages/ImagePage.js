@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from "react-router-dom"
-import { AppContext } from "../AppContext"
+import { AppContext } from "../context/AppContext"
 import { LoaderScreenCentered } from "../components/LoaderScreenCentered"
-import { getCookie } from "../CookieAssistant"
+import { getCookie } from "../helpers/CookieAssistant"
 import { FcLike, FcLikePlaceholder } from "react-icons/fc"
 import { RiDeleteBinLine } from "react-icons/ri"
 
