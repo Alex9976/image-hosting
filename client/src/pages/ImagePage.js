@@ -41,7 +41,7 @@ export const ImagePage = () => {
             authContext.socket.emit('delete_image', { jwt, id })
 
             authContext.socket.on('delete_image_result', (data) => {
-                history.push('/')
+                history(-1)
             })
         }
         deleteAsync()
@@ -99,7 +99,7 @@ export const ImagePage = () => {
             })
 
             authContext.socket.on('get_comments_result', (data) => {
-                if (!cleanupFunction) setComments(data)
+                setComments(data)
             })
         }
 

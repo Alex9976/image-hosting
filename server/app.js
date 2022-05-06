@@ -304,7 +304,7 @@ async function start() {
                                 console.log(imageFilePath + ' deleted successfully')
                             })
 
-                            socket.emit('delete_inage_result', {})
+                            socket.emit('delete_image_result', {})
                         }
                         else {
                             socket.emit('auth_result', { error: 'Forbidden' })
